@@ -13,50 +13,52 @@ exports.getExperience = asyncHandler(async (req, res, next) => {
       new ErrorResponse(`Experience not found with id of ${req.params.id}`, 404)
     );
   }
-  res.status(200).json({
-    success: true,
-    data: experience,
-    msg: `Show experience ${req.params.id}`,
-  });
+  res.status(200).json(experience);
 });
 
 exports.createExperience = asyncHandler(async (req, res, next) => {
+  req.body.user = req.user.id;
   const experience = await Experience.create(req.body);
-  res
-    .status(201)
-    .json({ success: true, data: experience, msg: `Create new experience` });
+  res.status(201).json(experience);
 });
 
 exports.updateExperience = asyncHandler(async (req, res, next) => {
-  const experience = await Experience.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    {
-      new: true,
-    }
-  );
+  let experience = await Experience.findById(req.params.id);
+
   if (!experience) {
     return next(
       new ErrorResponse(`Experience not found with id of ${req.params.id}`, 404)
     );
   }
-  res.status(200).json({
-    success: true,
-    date: experience,
-    msg: `Update experience ${req.params.id}`,
+  if (experience.user.toString() !== req.user.id && req.user.role !== "admin") {
+    return next(
+      new ErrorResponse(
+        `User ${req.user.id} is not authorized to update this !`,
+        401
+      )
+    );
+  }
+  experience = await Experience.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
   });
+  res.status(200).json(experience);
 });
 
 exports.deleteExperience = asyncHandler(async (req, res, next) => {
-  const experience = await Experience.findByIdAndDelete(req.params.id);
+  let experience = await Experience.findById(req.params.id);
   if (!experience) {
     return next(
       new ErrorResponse(`Experience not found with id of ${req.params.id}`, 404)
     );
   }
-  res.status(200).json({
-    success: true,
-    data: null,
-    msg: `Delete experience ${req.params.id}`,
-  });
+  if (experience.user.toString() !== req.user.id && req.user.role !== "admin") {
+    return next(
+      new ErrorResponse(
+        `User ${req.user.id} is not authorized to delete this !`,
+        401
+      )
+    );
+  }
+  experience.remove();
+  res.status(200).json(null);
 });

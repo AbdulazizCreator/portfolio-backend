@@ -23,8 +23,6 @@ const advancedResults =
     } else {
       query = model.find(JSON.parse(queryStr));
     }
-    const nat = await model.find({ answer: { $gt: "" } });
-    console.log(nat);
 
     // Select Fields
     if (req.query.select) {
@@ -44,7 +42,8 @@ const advancedResults =
     const limit = parseInt(req.query.limit) || 10;
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
-    const total = await model.countDocuments();
+    const results = await query;
+    const total = results.length;
 
     query = query.skip(startIndex).limit(limit);
 
@@ -52,7 +51,7 @@ const advancedResults =
       query = query.populate(populate);
     }
 
-    const results = await query;
+    const pageResults = await query;
 
     let pagination = {};
 
@@ -67,9 +66,9 @@ const advancedResults =
     pagination.limit = limit;
     res.advancedResults = {
       success: true,
-      count: results.length,
+      count: pageResults.length,
       pagination,
-      data: results,
+      data: pageResults,
     };
     next();
   };

@@ -9,7 +9,7 @@ const ErrorResponse = require("../utils/errorResponse");
 // @access public
 
 exports.register = asyncHandler(async (req, res, next) => {
-  const { first_name, last_name, password, username, role } = req.body;
+  const { firstName, lastName, password, username, client } = req.body;
 
   // Check for user
   const user = await User.findOne({ username });
@@ -20,11 +20,11 @@ exports.register = asyncHandler(async (req, res, next) => {
 
   // Create user
   const newUser = await User.create({
-    first_name,
-    last_name,
+    firstName,
+    lastName,
     username,
     password,
-    role,
+    client,
   });
 
   sendTokenResponse(newUser, 200, res);
@@ -45,7 +45,7 @@ exports.login = asyncHandler(async (req, res, next) => {
 
   // Check for user
   const user = await User.findOne({ username }).select("+password");
-  
+
   if (!user) {
     return next(new ErrorResponse("Bu foydalanuvchi mavjud emas !", 401));
   }
@@ -65,12 +65,14 @@ exports.login = asyncHandler(async (req, res, next) => {
 // @access private
 
 exports.updateDetails = asyncHandler(async (req, res, next) => {
+  delete req.body.role;
+  delete req.body.password;
   const user = await User.findByIdAndUpdate(req.user._id, req.body, {
     new: true,
     runValidors: true,
   });
 
-  res.status(200).json({ success: true, data: user });
+  res.status(200).json(user);
 });
 
 // @desc   Update User Password
@@ -101,7 +103,7 @@ exports.updatePassword = asyncHandler(async (req, res, next) => {
 exports.getMe = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
 
-  res.status(200).json({ success: true, data: user });
+  res.status(200).json(user);
 });
 
 // @desc   Upload photo for user
@@ -141,7 +143,7 @@ exports.uploadUserImage = asyncHandler(async (req, res, next) => {
     await User.findByIdAndUpdate(req.user.id, { photo: file.name });
   });
 
-  res.status(201).json({ success: true, data: file.name });
+  res.status(201).json(file.name);
 });
 
 exports.deleteUserImage = asyncHandler(async (req, res, next) => {

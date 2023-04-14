@@ -14,57 +14,59 @@ exports.getPortfolio = asyncHandler(async (req, res, next) => {
       new ErrorResponse(`Portfolio not found with id of ${req.params.id}`, 404)
     );
   }
-  res.status(200).json({
-    success: true,
-    data: portfolio,
-    msg: `Show Portfolio ${req.params.id}`,
-  });
+  res.status(200).json(portfolio);
 });
 
 exports.createPortfolio = asyncHandler(async (req, res, next) => {
+  req.body.user = req.user.id;
   const photo = await Photo.findById(req.body.photo);
 
   if (!photo) {
     return next(
-      new ErrorResponse(
-        `No photo with the id of ${req.body.photo}`,
-        404
-      )
+      new ErrorResponse(`No photo with the id of ${req.body.photo}`, 404)
     );
   }
   const portfolio = await Portfolio.create(req.body);
-  res
-    .status(201)
-    .json({ success: true, data: portfolio, msg: `Create new portfolio` });
+  res.status(201).json(portfolio);
 });
 
 exports.updatePortfolio = asyncHandler(async (req, res, next) => {
-  const portfolio = await Portfolio.findByIdAndUpdate(req.params.id, req.body, {
+  let portfolio = await Portfolio.findById(req.params.id);
+  if (!portfolio) {
+    return next(
+      new ErrorResponse(`Portfolio not found with id of ${req.params.id}`, 404)
+    );
+  }
+  if (portfolio.user.toString() !== req.user.id && req.user.role !== "admin") {
+    return next(
+      new ErrorResponse(
+        `User ${req.user.id} is not authorized to update this !`,
+        401
+      )
+    );
+  }
+  portfolio = await Portfolio.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
   });
-  if (!portfolio) {
-    return next(
-      new ErrorResponse(`Portfolio not found with id of ${req.params.id}`, 404)
-    );
-  }
-  res.status(200).json({
-    success: true,
-    date: portfolio,
-    msg: `Update portfolio ${req.params.id}`,
-  });
+  res.status(200).json(portfolio);
 });
 
 exports.deletePortfolio = asyncHandler(async (req, res, next) => {
-  const portfolio = await Portfolio.findByIdAndDelete(req.params.id);
+  let portfolio = await Portfolio.findById(req.params.id);
   if (!portfolio) {
     return next(
       new ErrorResponse(`Portfolio not found with id of ${req.params.id}`, 404)
     );
   }
-  res.status(200).json({
-    success: true,
-    data: null,
-    msg: `Delete portfolio ${req.params.id}`,
-  });
+  if (portfolio.user.toString() !== req.user.id && req.user.role !== "admin") {
+    return next(
+      new ErrorResponse(
+        `User ${req.user.id} is not authorized to delete this !`,
+        401
+      )
+    );
+  }
+  portfolio.remove();
+  res.status(200).json(null);
 });

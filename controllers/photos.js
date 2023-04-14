@@ -30,7 +30,7 @@ exports.uploadImage = asyncHandler(async (req, res, next) => {
   // Create custom filename
   database_name = `photo${path.parse(file.name).ext}`;
   console.log(database_name);
-  photo = await PhotoSchema.create({ name: database_name });
+  photo = await PhotoSchema.create({ name: database_name, user: req.user.id });
 
   file.name = `${photo.id}${path.parse(file.name).ext}`;
   console.log(file.name);
@@ -40,7 +40,7 @@ exports.uploadImage = asyncHandler(async (req, res, next) => {
       return next(new ErrorResponse(`Problem with file upload`, 500));
     }
   });
-  res.status(201).json({ success: true, data: photo });
+  res.status(201).json(photo);
 });
 
 exports.deleteImage = asyncHandler(async (req, res, next) => {

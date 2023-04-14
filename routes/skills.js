@@ -17,12 +17,12 @@ const router = express.Router();
 router
   .route("/")
   .get(advancedResults(Skill), getSkills)
-  .post(protect, authorize("admin"), createSkill);
+  .post(protect, authorize("admin", "client"), createSkill);
 
 router
   .route("/:id")
   .get(getSkill)
-  .put(protect, authorize("admin"), updateSkill)
-  .delete(protect, authorize("admin"), deleteSkill);
+  .put(protect, authorize("admin", "client"), updateSkill)
+  .delete(protect, authorize("admin", "client"), deleteSkill);
 
 module.exports = router;

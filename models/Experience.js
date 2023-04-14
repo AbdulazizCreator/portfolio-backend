@@ -1,23 +1,28 @@
 const mongoose = require("mongoose");
 
 const ExperienceSchema = new mongoose.Schema({
-  work_name: {
-    type: String,
-    required: [true, "Please add a work_name"],
+  user: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+    required: true,
   },
-  company_name: {
+  workName: {
     type: String,
-    required: [true, "Please add a company_name"],
+    required: [true, "Please add a work name"],
+  },
+  companyName: {
+    type: String,
+    required: [true, "Please add a company name"],
   },
   description: {
     type: String,
     required: [true, "Please add a description"],
   },
-  start_date: {
+  startDate: {
     type: Date,
     required: true,
   },
-  end_date: {
+  endDate: {
     type: Date,
     required: true,
   },

@@ -23,12 +23,12 @@ router
     }),
     getPortfolios
   )
-  .post(protect, authorize("admin"), createPortfolio);
+  .post(protect, authorize("admin", "client"), createPortfolio);
 
 router
   .route("/:id")
   .get(getPortfolio)
-  .put(protect, authorize("admin"), updatePortfolio)
-  .delete(protect, authorize("admin"), deletePortfolio);
+  .put(protect, authorize("admin", "client"), updatePortfolio)
+  .delete(protect, authorize("admin", "client"), deletePortfolio);
 
 module.exports = router;

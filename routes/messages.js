@@ -20,18 +20,18 @@ router
   .route("/")
   .post(sendMessage)
   .get(
-    authorize("admin"),
+    // authorize("admin", "client"),
     advancedResults(Message, {
       path: "user",
-      select: "username first_name last_name",
+      select: "username firstName lastName",
     }),
     getMessages
   );
 
 router
   .route("/:id")
-  .get(getMessage)
-  .put(answerMessage)
-  .delete(deleteMessage);
+  .get(authorize("admin", "client"), getMessage)
+  .put(authorize("admin", "client"), answerMessage)
+  .delete(authorize("admin", "client"), deleteMessage);
 
 module.exports = router;

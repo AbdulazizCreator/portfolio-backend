@@ -3,11 +3,11 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
 const UserSchema = new mongoose.Schema({
-  first_name: {
+  firstName: {
     type: String,
     required: [true, "Please add a first name"],
   },
-  last_name: {
+  lastName: {
     type: String,
     required: [true, "Please add a last name"],
   },
@@ -25,7 +25,14 @@ const UserSchema = new mongoose.Schema({
   role: {
     type: String,
     default: "user",
-    enum: ["user", "admin"],
+    enum: ["user", "admin", "client"],
+  },
+  fields: {
+    type: [String],
+  },
+  client: {
+    type: Boolean,
+    default: false,
   },
   info: {
     type: String,
@@ -41,6 +48,24 @@ const UserSchema = new mongoose.Schema({
     type: String,
   },
   email: {
+    type: String,
+  },
+  github: {
+    type: String,
+  },
+  likedin: {
+    type: String,
+  },
+  telegram: {
+    type: String,
+  },
+  instagram: {
+    type: String,
+  },
+  youtube: {
+    type: String,
+  },
+  facebook: {
     type: String,
   },
   photo: {

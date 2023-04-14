@@ -17,12 +17,12 @@ const router = express.Router();
 router
   .route("/")
   .get(advancedResults(Experience), getExperiences)
-  .post(protect, authorize("admin"), createExperience);
+  .post(protect, authorize("admin", "client"), createExperience);
 
 router
   .route("/:id")
   .get(getExperience)
-  .put(protect, authorize("admin"), updateExperience)
-  .delete(protect, authorize("admin"), deleteExperience);
+  .put(protect, authorize("admin", "client"), updateExperience)
+  .delete(protect, authorize("admin", "client"), deleteExperience);
 
 module.exports = router;
